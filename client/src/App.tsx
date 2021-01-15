@@ -158,7 +158,7 @@ const getColor = (props: DropzoneRootProps) => {
   if (props.isDragActive) {
     return "#2196f3";
   }
-  return "rgba(255,255,255,0.05)";
+  return "rgba(255,255,255,0.03)";
 };
 
 const getBorderStyles = (props: DropzoneRootProps) => {
@@ -323,8 +323,8 @@ const DropContainer = styled.div`
     border-color: rgba(255, 255, 255, 0.5);
   }
   outline: none;
-  transition: background 0.24s ease-in-out;
-  transition: border 0.24s ease-in-out;
+  transition: background 0.2s ease-in-out;
+  transition: border 0.1s ease-in-out;
   border-radius: 1rem;
 `;
 
