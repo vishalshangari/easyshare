@@ -9,6 +9,9 @@ import axios from "axios";
 import { IoIosCopy } from "react-icons/io";
 import { FaRedo } from "react-icons/fa";
 
+// Constants
+import { publicURL } from "./config/constants";
+
 const App = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadSuccessful, setIsUploadSuccessful] = useState(false);
@@ -50,7 +53,7 @@ const App = () => {
     formData.append("ContentType", file.type);
     try {
       const { data: key } = await axios.post(
-        "https://easyshare24.herokuapp.com/api/upload",
+        `${publicURL}api/upload`,
         formData
       );
       setEasyShareKey(key);
@@ -70,14 +73,14 @@ const App = () => {
   const handleCopyToClipboard = () => {
     const dummy = document.createElement("textarea");
     document.body.appendChild(dummy);
-    dummy.value = `https://easyshare24.herokuapp.com/${easyShareKey}`;
+    dummy.value = `${publicURL}${easyShareKey}`;
     dummy.select();
     document.execCommand("copy");
     document.body.removeChild(dummy);
   };
 
   const linkify = (): string => {
-    return `https://easyshare24.herokuapp.com/${easyShareKey}`;
+    return `${publicURL}${easyShareKey}`;
   };
 
   return (

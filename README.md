@@ -4,7 +4,7 @@ This was made for the Shopify Backend Developer Intern Challenge (Summer 2021). 
 
 ### Usage
 
-1.  Navigate to [easyshare24.herokuapp.com](https://easyshare24.herokuapp.com/)
+1.  Navigate to [easyshare.vishalshangari.com](https://easyshare.vishalshangari.com/)
 2.  Upload an image!
 
 ### Motivation
