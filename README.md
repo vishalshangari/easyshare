@@ -61,7 +61,7 @@ Development:
 
 To run upload test against test database, ensure a `test.json` config file is created (see above). Then simply:
 
-`npm test`
+    npm test
 
 ### Deploy
 
