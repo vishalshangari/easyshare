@@ -1,23 +1,20 @@
-const defaultConfig = require("../config/default");
-const testConfig = require("../config/test");
-
 const firebaseAdmin = require("firebase-admin");
 
 const servAcc = {
   projectId:
     process.env.NODE_ENV == "test"
-      ? testConfig.project_id
-      : defaultConfig.project_id,
+      ? process.env.TEST_FIREBASE_PROJECT_ID
+      : process.env.FIREBASE_PROJECT_ID,
   privateKey:
     process.env.NODE_ENV == "test"
-      ? testConfig.private_key
+      ? process.env.TEST_FIREBASE_PRIVATE_KEY
       : process.env.NODE_ENV == "development"
-      ? defaultConfig.private_key
-      : JSON.parse(defaultConfig.private_key),
+      ? process.env.FIREBASE_PRIVATE_KEY
+      : JSON.parse(process.env.FIREBASE_PRIVATE_KEY),
   clientEmail:
     process.env.NODE_ENV == "test"
-      ? testConfig.client_email
-      : defaultConfig.client_email,
+      ? process.env.TEST_FIREBASE_CLIENT_EMAIL
+      : process.env.FIREBASE_CLIENT_EMAIL,
 };
 
 firebaseAdmin.initializeApp({
