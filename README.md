@@ -22,19 +22,24 @@ As this is just a rapid prototype, please note that all images are publicly acce
 
 ### Requirements
 
-This application uses a Google Cloud Firestore database (Firebase Admin SDK for access) and an AWS S3 bucket for storage. In `/config/` create two files `default.json` and `test.json` (optional for Mocha test against test database):
+- Firebase project (with Cloud Firestore DB enabled)
+- AWS S3 bucket
 
-    {
-        "project_id": [FIREBASE_PROJECT_ID],
-        "private_key": [FIREBASE_API_PRIVATE_KEY],
-        "client_email": [FIREBASE_ADMIN_SDK_CLIENT_EMAIL],
-    }
+### Configuration
 
-Environment variables:
+Set up the following environment variables:
 
-    BUCKET_REGION=[S3_BUCKET_REGION]
-    S3_KEY=[S3_API_KEY]
-    S3_SECRET[S3_API_SECRET]
+    S3_BUCKET_REGION=
+    S3_BUCKET_NAME=
+    S3_KEY=
+    S3_SECRET=
+    FIREBASE_PRIVATE_KEY=
+    FIREBASE_PROJECT_ID=
+    FIREBASE_CLIENT_EMAIL=
+    // Optional for test database
+    TEST_FIREBASE_PRIVATE_KEY=
+    TEST_FIREBASE_PROJECT_ID=
+    TEST_FIREBASE_CLIENT_EMAIL=
     // Required for configuring file uploads
     NODE_OPTIONS=--max-old-space-size=4096
 
