@@ -1,5 +1,4 @@
 // Node
-const cluster = require("cluster");
 require("dotenv").config();
 const path = require("path");
 
@@ -32,7 +31,7 @@ const faviconURL = `https://image-auction.s3-us-west-2.amazonaws.com/favicon.ico
 AWS.config = new AWS.Config({
   accessKeyId: process.env.S3_KEY,
   secretAccessKey: process.env.S3_SECRET,
-  region: process.env.BUCKET_REGION,
+  region: process.env.S3_BUCKET_REGION,
 });
 
 const s3 = new AWS.S3();
@@ -58,95 +57,81 @@ const upload = multer({
   }),
 });
 
-if (!isDev && cluster.isMaster) {
-  console.error(`Node cluster master ${process.pid} is running`);
+const app = express();
+app.use(express.json());
+app.use(cors());
+app.use(bodyParser.json());
 
-  // Fork workers
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
+// Handlebars templating
+app.engine("handlebars", exphbs());
+app.set("view engine", "handlebars");
+app.set("views", path.join(__dirname, "views"));
+
+// Priority serve upload API route
+app.post("/api/upload", upload.single("image"), async (req, res) => {
+  const { key: easyShareKey, keyWithOriginalFileExtension } = req;
+  const awsURL = `https://${process.env.S3_BUCKET_NAME}.s3-${process.env.S3_BUCKET_REGION}.amazonaws.com/${keyWithOriginalFileExtension}`;
+  if (!(easyShareKey && keyWithOriginalFileExtension)) {
+    // Send server error
+    res.sendStatus(500);
+  } else {
+    await db.collection("pathnames").doc(easyShareKey).set({
+      awsURL: awsURL,
+    });
+    res.send({ key: easyShareKey });
+  }
+});
+
+// Main route for serving images
+app.get("/:id", async (req, res, next) => {
+  const { id } = req.params;
+
+  // Check firebase for existence of key
+  const pathRef = db.collection("pathnames").doc(id);
+  const doc = await pathRef.get();
+
+  if (!doc.exists || !doc.data()) {
+    // No key or data
+    return next();
   }
 
-  cluster.on("exit", (worker, code, signal) => {
-    console.error(
-      `Node cluster worker ${worker.process.pid} exited: code ${code}, signal ${signal}`
-    );
-  });
-} else {
-  // Express
-  const app = express();
-  app.use(express.json());
-  app.use(cors());
-  app.use(bodyParser.json());
+  // Serve AWS URL if key+image exist
+  const data = doc.data();
+  let helpers;
+  if (data) {
+    helpers = {
+      loadSuccess: true,
+      loadFailure: false,
+      imgSrc: data.awsURL,
+      easyShareKey: id,
+      faviconURL: faviconURL,
+    };
+  } else {
+    helpers = {
+      loadSuccess: false,
+      loadFailure: true,
+      imgSrc: "",
+      easyShareKey: "Something went wrong! - easyshare",
+      faviconURL: faviconURL,
+    };
+  }
+  res.render("image", helpers);
+});
 
-  // Handlebars templating
-  app.engine("handlebars", exphbs());
-  app.set("view engine", "handlebars");
-  app.set("views", path.join(__dirname, "views"));
+// Priority serve any static files.
+app.use(express.static(path.resolve(__dirname, "../client/build")));
 
-  // Priority serve upload API route
-  app.post("/api/upload", upload.single("image"), async (req, res) => {
-    const { key: easyShareKey, keyWithOriginalFileExtension } = req;
-    const awsURL = `https://image-auction.s3-us-west-2.amazonaws.com/${keyWithOriginalFileExtension}`;
-    if (!(easyShareKey && keyWithOriginalFileExtension)) {
-      // Send server error
-      res.sendStatus(500);
-    } else {
-      await db.collection("pathnames").doc(easyShareKey).set({
-        awsURL: awsURL,
-      });
-      res.send(easyShareKey);
-    }
-  });
+// All remaining requests return the React app, so React Router can handle forwarding.
+app.get("*", (req, res) => {
+  if (isDev) {
+    res.redirect("/");
+  } else {
+    res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
+  }
+});
 
-  // Main route for serving images
-  app.get("/:id", async (req, res, next) => {
-    const { id } = req.params;
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
+});
 
-    // Check firebase for existence of key
-    const pathRef = db.collection("pathnames").doc(id);
-    const doc = await pathRef.get();
-
-    if (!doc.exists || !doc.data()) {
-      // No key or data
-      return next();
-    }
-
-    // Serve AWS URL if key+image exist
-    const data = doc.data();
-    let helpers;
-    if (data) {
-      helpers = {
-        loadSuccess: true,
-        loadFailure: false,
-        imgSrc: data.awsURL,
-        easyShareKey: id,
-        faviconURL: faviconURL,
-      };
-    } else {
-      helpers = {
-        loadSuccess: false,
-        loadFailure: true,
-        imgSrc: "",
-        easyShareKey: "Something went wrong! - easyshare",
-        faviconURL: faviconURL,
-      };
-    }
-    res.render("image", helpers);
-  });
-
-  // Priority serve any static files.
-  app.use(express.static(path.resolve(__dirname, "../client/build")));
-
-  // All remaining requests return the React app, so React Router can handle forwarding.
-  app.get("*", (req, res) => {
-    if (isDev) {
-      res.redirect("/");
-    } else {
-      res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
-    }
-  });
-
-  app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
-  });
-}
+module.exports = app;

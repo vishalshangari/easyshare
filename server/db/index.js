@@ -1,13 +1,23 @@
+const defaultConfig = require("../config/default.json");
+const testConfig = require("../config/test.json");
+
 const firebaseAdmin = require("firebase-admin");
 
 const servAcc = {
-  projectId: "easyshare-f66a0",
+  projectId:
+    process.env.NODE_ENV == "test"
+      ? testConfig.project_id
+      : defaultConfig.project_id,
   privateKey:
-    process.env.NODE_ENV == "development"
-      ? process.env.FIREBASE_PRIVATE_KEY
-      : JSON.parse(process.env.FIREBASE_PRIVATE_KEY),
+    process.env.NODE_ENV == "test"
+      ? testConfig.private_key
+      : process.env.NODE_ENV == "development"
+      ? defaultConfig.private_key
+      : JSON.parse(defaultConfig.private_key),
   clientEmail:
-    "firebase-adminsdk-olsez@easyshare-f66a0.iam.gserviceaccount.com",
+    process.env.NODE_ENV == "test"
+      ? testConfig.client_email
+      : defaultConfig.client_email,
 };
 
 firebaseAdmin.initializeApp({

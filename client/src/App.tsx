@@ -52,10 +52,9 @@ const App = () => {
     formData.append("image", file);
     formData.append("ContentType", file.type);
     try {
-      const { data: key } = await axios.post(
-        `${publicURL}api/upload`,
-        formData
-      );
+      const {
+        data: { key },
+      } = await axios.post(`${publicURL}api/upload`, formData);
       setEasyShareKey(key);
     } catch (error) {
       throw error;
