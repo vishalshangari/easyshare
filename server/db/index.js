@@ -1,5 +1,5 @@
-const defaultConfig = require("../config/default.json");
-const testConfig = require("../config/test.json");
+const defaultConfig = require("../config/default");
+const testConfig = require("../config/test");
 
 const firebaseAdmin = require("firebase-admin");
 
