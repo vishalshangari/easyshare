@@ -1,3 +1,5 @@
+![eayshare - one click image sharing](easyshare-logo.png)
+
 # easyshare &mdash; one click image sharing
 
 ### Usage
