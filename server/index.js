@@ -25,7 +25,7 @@ const generateUniquePathname = require("./services/generateUniquePathname");
 const isDev = process.env.NODE_ENV == "development";
 const port = process.env.PORT || 4000;
 const numCPUs = require("os").cpus().length;
-const faviconURL = `https://image-auction.s3-us-west-2.amazonaws.com/favicon.ico`;
+const faviconURL = `https://easyshare-v1.s3-us-west-1.amazonaws.com/favicon.ico`;
 
 // Configure AWS
 AWS.config = new AWS.Config({
@@ -40,7 +40,7 @@ const s3 = new AWS.S3();
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: "image-auction",
+    bucket: process.env.S3_BUCKET_NAME,
     contentType: multerS3.AUTO_CONTENT_TYPE,
     acl: "public-read",
     metadata: (req, file, cb) => {

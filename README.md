@@ -66,7 +66,7 @@ Development:
 
 ### Testing (optional)
 
-To run upload test against test database, ensure a `test.json` config file is created (see above). Then simply:
+To run upload test against test database, ensure testing DB is configured using environment variables (see above). Then simply:
 
     npm test
 
