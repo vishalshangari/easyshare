@@ -340,7 +340,7 @@ const AppContainer = styled.div`
 
 const StyledApp = styled.div`
   text-align: center;
-  background-color: #0d1117;
+  background-color: #253142;
   height: 100vh;
   display: flex;
   flex-direction: column;
